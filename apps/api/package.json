@@ -1,0 +1,44 @@
+{
+  "name": "@planningos/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "PlanningOS NestJS backend API",
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "nest build",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint \"src/**/*.ts\"",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.27",
+    "@nestjs/core": "11.1.27",
+    "@nestjs/platform-express": "11.1.27",
+    "@sentry/nestjs": "10.59.0",
+    "dotenv": "17.4.2",
+    "drizzle-orm": "0.45.2",
+    "pg": "8.22.0",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.4",
+    "@nestjs/cli": "11.0.23",
+    "@nestjs/schematics": "11.1.0",
+    "@types/express": "5.0.6",
+    "@types/node": "^24.13.2",
+    "@types/pg": "8.20.0",
+    "drizzle-kit": "0.31.10",
+    "eslint": "9.39.4",
+    "globals": "17.7.0",
+    "source-map-support": "0.5.21",
+    "ts-loader": "9.6.2",
+    "ts-node": "10.9.2",
+    "tsconfig-paths": "4.2.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.62.0"
+  }
+}

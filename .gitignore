@@ -1,0 +1,38 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# build output
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# env / secrets — never commit (see 07_DEPLOYMENT.md)
+.env
+.env.*
+!.env.example
+
+# drizzle generated migrations are tracked; local journal scratch is not
+**/drizzle/.cache/
+
+# logs
+*.log
+npm-debug.log*
+
+# editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# test / coverage
+coverage/
+
+# graphify output
+.graphify/
+graphify-out/
+*.graphify.html
+*.graphify.json

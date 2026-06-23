@@ -1,0 +1,40 @@
+/*
+ * Global styles — light theme only (see 02_ARCHITECTURE.md).
+ * Minimal, accessible baseline for Batch 1.1. The real design system from
+ * design-system/MASTER.md (ui-ux-pro-max, WCAG 2.2 AA) is applied in Batch 1.6.
+ */
+:root {
+  color-scheme: light;
+  --background: #ffffff;
+  --foreground: #1a1a1a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+}
+
+main {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}

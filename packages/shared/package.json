@@ -1,0 +1,16 @@
+{
+  "name": "@planningos/shared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared types and validation schemas across PlanningOS apps",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

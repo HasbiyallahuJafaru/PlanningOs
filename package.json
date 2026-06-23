@@ -1,0 +1,24 @@
+{
+  "name": "planningos",
+  "version": "0.0.0",
+  "private": true,
+  "description": "UK Planning and Permitting Platform (working title: PlanningOS) — monorepo root",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "npm run dev --workspace @planningos/api",
+    "dev:web": "npm run dev --workspace @planningos/web",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "10.0.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

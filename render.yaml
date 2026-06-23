@@ -1,0 +1,69 @@
+# render.yaml — Render Blueprint (infra-as-code). SOURCE OF TRUTH for all
+# services and datastores (07_DEPLOYMENT.md). Any dashboard change must be
+# reflected back here in the same session.
+#
+# STATUS: DRAFT for Batch 1.1 — NOT yet deployed. Validate ports, build/start
+# commands, and plans at the first real deploy (a later batch).
+#
+# Region: `frankfurt` (EU) on every service and datastore — Render has no UK
+# region; Frankfurt satisfies the EU/UK data-residency requirement in
+# 05_COMPLIANCE.md. Never let a service inherit a non-EU default.
+#
+# Secrets (SENTRY_DSN, etc.) are NOT in this file — set them in Render's secret
+# manager. `sync: false` marks an env var whose value must be entered there.
+
+services:
+  # --- NestJS API ---
+  - name: planningos-api
+    type: web
+    runtime: node
+    region: frankfurt
+    plan: starter
+    buildCommand: npm ci && npm run build --workspace @planningos/api
+    startCommand: npm run start --workspace @planningos/api
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SENTRY_ENVIRONMENT
+        value: production
+      - key: SENTRY_DSN
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: planningos-postgres
+          property: connectionString
+      # REDIS_URL is consumed once BullMQ lands (Batch 1.4); the Key Value
+      # instance below is defined now so the blueprint reflects target infra.
+      - key: REDIS_URL
+        fromService:
+          name: planningos-redis
+          type: keyvalue
+          property: connectionString
+
+  # --- Next.js web app ---
+  - name: planningos-web
+    type: web
+    runtime: node
+    region: frankfurt
+    plan: starter
+    buildCommand: npm ci && npm run build --workspace @planningos/web
+    startCommand: npm run start --workspace @planningos/web
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+
+  # --- Redis / Key Value (for BullMQ extraction queue, Batch 1.4) ---
+  - name: planningos-redis
+    type: keyvalue
+    region: frankfurt
+    plan: starter
+    ipAllowList: []
+
+databases:
+  - name: planningos-postgres
+    region: frankfurt
+    plan: basic-256mb
+    postgresMajorVersion: "16"
