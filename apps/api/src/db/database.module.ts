@@ -3,40 +3,56 @@ import { Pool } from 'pg';
 import {
   createDrizzle,
   createPool,
-  DRIZZLE,
-  PG_POOL,
+  DRIZZLE_APP,
+  DRIZZLE_PRIVILEGED,
+  PG_POOL_APP,
+  PG_POOL_PRIVILEGED,
 } from './drizzle.provider';
+import { TenantDb } from './tenant-db.service';
 
 /**
  * Global database module.
  *
- * Provides a single Postgres connection Pool and the Drizzle instance built on
- * top of it, both exported so any module can inject them via the DRIZZLE /
- * PG_POOL tokens. Marked @Global so feature modules do not need to re-import it.
- *
- * Closes the pool on application shutdown (requires app.enableShutdownHooks()
- * in main.ts) to avoid leaking connections.
+ * Wires the two connections behind the hybrid tenant-isolation model
+ * (see drizzle.provider.ts): a PRIVILEGED pool (RLS-bypassing, for auth
+ * bootstrap) and an APP pool (RLS-enforced, for tenant-scoped queries via
+ * TenantDb). Both pools are closed on shutdown (requires
+ * app.enableShutdownHooks() in main.ts).
  */
 @Global()
 @Module({
   providers: [
     {
-      provide: PG_POOL,
-      useFactory: createPool,
+      provide: PG_POOL_PRIVILEGED,
+      useFactory: () => createPool(process.env.DATABASE_URL, 'DATABASE_URL'),
     },
     {
-      provide: DRIZZLE,
-      inject: [PG_POOL],
+      provide: PG_POOL_APP,
+      useFactory: () =>
+        createPool(process.env.APP_DATABASE_URL, 'APP_DATABASE_URL'),
+    },
+    {
+      provide: DRIZZLE_PRIVILEGED,
+      inject: [PG_POOL_PRIVILEGED],
       useFactory: (pool: Pool) => createDrizzle(pool),
     },
+    {
+      provide: DRIZZLE_APP,
+      inject: [PG_POOL_APP],
+      useFactory: (pool: Pool) => createDrizzle(pool),
+    },
+    TenantDb,
   ],
-  exports: [DRIZZLE, PG_POOL],
+  exports: [DRIZZLE_PRIVILEGED, DRIZZLE_APP, TenantDb],
 })
 export class DatabaseModule implements OnModuleDestroy {
-  constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
+  constructor(
+    @Inject(PG_POOL_PRIVILEGED) private readonly privilegedPool: Pool,
+    @Inject(PG_POOL_APP) private readonly appPool: Pool,
+  ) {}
 
-  /** Closes the Postgres connection pool when the app shuts down. */
+  /** Closes both connection pools when the app shuts down. */
   async onModuleDestroy(): Promise<void> {
-    await this.pool.end();
+    await Promise.allSettled([this.privilegedPool.end(), this.appPool.end()]);
   }
 }

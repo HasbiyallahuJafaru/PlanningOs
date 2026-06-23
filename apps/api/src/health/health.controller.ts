@@ -1,6 +1,6 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { sql } from 'drizzle-orm';
-import { DRIZZLE, type Database } from '../db/drizzle.provider';
+import { DRIZZLE_PRIVILEGED, type Database } from '../db/drizzle.provider';
 
 /**
  * Health and diagnostics endpoints.
@@ -14,7 +14,7 @@ import { DRIZZLE, type Database } from '../db/drizzle.provider';
  */
 @Controller('health')
 export class HealthController {
-  constructor(@Inject(DRIZZLE) private readonly db: Database) {}
+  constructor(@Inject(DRIZZLE_PRIVILEGED) private readonly db: Database) {}
 
   /** Liveness probe — the service is running. */
   @Get()

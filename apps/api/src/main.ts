@@ -3,7 +3,7 @@
 import './instrument';
 
 import { NestFactory } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 /**
@@ -16,6 +16,15 @@ import { AppModule } from './app.module';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   app.enableShutdownHooks();
+
+  // Validate and strip request DTOs globally; reject unknown properties.
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Render (and most PaaS) inject PORT; locally we use API_PORT. Prefer PORT.
   const port = Number(process.env.PORT ?? process.env.API_PORT ?? 3001);
